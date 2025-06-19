@@ -1,7 +1,5 @@
 ARG node_version=22.16.0
 
-
-
 FROM node:${node_version}-slim AS pgdg
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -15,22 +13,13 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(grep -oP 'VERSION_CODEN
     && curl https://www.postgresql.org/media/keys/ACCC4CF8.asc \
       | gpg --dearmor > /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg
 
-
-
 FROM node:${node_version}-slim AS intermediate
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        git \
     && rm -rf /var/lib/apt/lists/*
 COPY . .
-RUN mkdir /tmp/sentry-versions
-RUN git describe --tags --dirty > /tmp/sentry-versions/central
-WORKDIR /server
-RUN git describe --tags --dirty > /tmp/sentry-versions/server
-WORKDIR /client
-RUN git describe --tags --dirty > /tmp/sentry-versions/client
-
-
+# git describe वाली लाइनें हटा दी गईं क्योंकि .git मौजूद नहीं होगा
+RUN mkdir -p /tmp/sentry-versions
 
 FROM node:${node_version}-slim
 
