@@ -20,22 +20,22 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(grep -oP 'VERSION_CODEN
 FROM node:${node_version}-slim AS intermediate
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        git \
+         \
     && rm -rf /var/lib/apt/lists/*
 COPY . .
 RUN mkdir /tmp/sentry-versions
-RUN git describe --tags --dirty > /tmp/sentry-versions/central
+RUN  describe --tags --dirty > /tmp/sentry-versions/central
 WORKDIR /server
-RUN git describe --tags --dirty > /tmp/sentry-versions/server
+RUN  describe --tags --dirty > /tmp/sentry-versions/server
 WORKDIR /client
-RUN git describe --tags --dirty > /tmp/sentry-versions/client
+RUN  describe --tags --dirty > /tmp/sentry-versions/client
 
 
 
 FROM node:${node_version}-slim
 
 ARG node_version
-LABEL org.opencontainers.image.source="https://github.com/getodk/central"
+LABEL org.opencontainers.image.source="https://hub.com/getodk/central"
 
 WORKDIR /usr/odk
 
