@@ -14,12 +14,14 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(grep -oP 'VERSION_CODEN
       | gpg --dearmor > /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg
 
 FROM node:${node_version}-slim AS intermediate
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
-COPY . .
-# git describe वाली लाइनें हटा दी गईं क्योंकि .git मौजूद नहीं होगा
+RUN apt-get update && apt-get install -y --no-install-recommends && rm -rf /var/lib/apt/lists/*
+# Avoid full copy
+COPY server/ ./server/
+COPY files/ ./files/
 RUN mkdir -p /tmp/sentry-versions
+RUN echo "v0.0.1" > /tmp/sentry-versions/central
+RUN echo "v0.0.1" > /tmp/sentry-versions/server
+RUN echo "v0.0.1" > /tmp/sentry-versions/client
 
 FROM node:${node_version}-slim
 
@@ -42,8 +44,7 @@ RUN apt-get update \
         postgresql-client-14 \
         netcat-traditional \
     && rm -rf /var/lib/apt/lists/* \
-    && npm clean-install --omit=dev --no-audit \
-        --fund=false --update-notifier=false
+    && npm ci --omit=dev
 
 COPY server/ ./
 COPY files/shared/envsub.awk /scripts/
